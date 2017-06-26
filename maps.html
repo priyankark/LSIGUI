@@ -20,6 +20,11 @@
   </head>
   <body>
     <div id="map"></div>
+    <div>
+      <button onClick="pyapi.showMessage('Hello from WebKit')">Press me</button>
+
+  </center>
+    </div>
     <script>
       var map;
       function initMap() {
@@ -29,6 +34,9 @@
           mapTypeId:"satellite"
         });
       }
+    </script>
+    <script>
+      document.write('<p>Python ' + pyObj.pyVersion + '</p>')
     </script>
     <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBiag1hi1KK7FsnMdjtamcO8Z66pfc4yNE&callback=initMap"
     async defer></script>
