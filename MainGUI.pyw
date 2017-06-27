@@ -11,7 +11,7 @@ from qgis.core import *
 from qgis.gui import *
 
 
-class Canvas(QDialog):
+class SHPCanvas(QDialog):
    def __init__(self):
        QDialog.__init__(self)
 
@@ -36,6 +36,36 @@ class Canvas(QDialog):
                grid.addWidget(canvas,i,j)
        self.setLayout(grid)
 
+class ShowSelectionsCanvas(QDialog):
+   def __init__(self):
+       QDialog.__init__(self)
+       layout=QVBoxLayout()
+       showDXFFilesWidget=QWidget()
+       layoutDXF=QVBoxLayout()
+       for i in GUIGlobalValues.listOfDXFFiles:
+           l=QLabel()
+           l.setText(i)
+           layoutDXF.addWidget(l)
+       showDXFFilesWidget.setLayout(layoutDXF)
+       layout.addWidget(showDXFFilesWidget)
+
+       imageCanvasWidget=QWidget()
+       grid=QGridLayout()
+       k=0
+       for i in range(len(GUIGlobalValues.listOfIMGFiles)/2):
+           for j in range(len(GUIGlobalValues.listOfIMGFiles)/2):
+               pic=QLabel()
+               pic.setPixmap(QPixmap(GUIGlobalValues.listOfIMGFiles[k]))
+               k+=1
+               pic.show()
+
+               grid.addWidget(pic,i,j)
+       imageCanvasWidget.setLayout(grid)
+       layout.addWidget(imageCanvasWidget)
+       #layout.addWidget(imageCanvasWidget)
+       self.setLayout(layout)
+
+
 
 
 
@@ -57,13 +87,16 @@ class takeInputDilaog(QDialog):
         self.longOfVertexLabel=QLabel("Longitude of Vertex")
         self.longText=QLineEdit()
 
-        self.selectSHPFilesLabel=QLabel("Select .shp files:")
-        self.selectSHPFilesButton=QPushButton("Select SHP files")
-        self.selectSHPFilesButton.clicked.connect(self.getSHPFiles)
+        self.selectDXFFilesLabel=QLabel("Select .dxf files:")
+        self.selectDXFFilesButton=QPushButton("Select DXF files")
+        self.selectDXFFilesButton.clicked.connect(self.getDXFFiles)
 
         self.selectIMGFilesLabel=QLabel("Select .svg files:")
         self.selectIMGFilesButton=QPushButton("Select SVG files")
         self.selectIMGFilesButton.clicked.connect(self.getIMGFiles)
+
+        self.showSelectionButton=QPushButton("Show selections")
+        self.showSelectionButton.clicked.connect(self.showSelection)
 
         self.submitButton=QPushButton("Submit")
         self.submitButton.clicked.connect(self.handleSubmit)
@@ -75,27 +108,27 @@ class takeInputDilaog(QDialog):
         fbox.addRow(self.northPointLabel,self.northPointText)
         fbox.addRow(self.latOfVertexLabel,self.latText)
         fbox.addRow(self.longOfVertexLabel,self.longText)
-        fbox.addRow(self.selectSHPFilesLabel,self.selectSHPFilesButton)
+        fbox.addRow(self.selectDXFFilesLabel,self.selectDXFFilesButton)
         fbox.addRow(self.selectIMGFilesLabel,self.selectIMGFilesButton)
-        fbox.addWidget(self.submitButton)
+        fbox.addRow(self.showSelectionButton,self.submitButton)
         fbox.setAlignment(Qt.AlignTop)
         self.setLayout(fbox)
 
-    def getSHPFiles(self):
+    def getDXFFiles(self):
         dlg=QFileDialog()
         dlg.setFileMode(QFileDialog.ExistingFiles)
-        dlg.setFilter("SHP Files (*.shp)")
+        dlg.setFilter("DXF Files (*.dxf)")
 
 
         if dlg.exec_():
             filename=dlg.selectedFiles()
-            GUIGlobalValues.listOfSHPFiles=filename
-            print GUIGlobalValues.listOfSHPFiles
+            GUIGlobalValues.listOfDXFFiles=filename
+            print GUIGlobalValues.listOfDXFFiles
 
     def getIMGFiles(self):
         dlg=QFileDialog()
         dlg.setFileMode(QFileDialog.ExistingFiles)
-        dlg.setFilter("SVG Files (*.svg)")
+        dlg.setFilter("PNG Files (*.png)")
 
         if dlg.exec_():
             filename=dlg.selectedFiles()
@@ -108,9 +141,14 @@ class takeInputDilaog(QDialog):
         GUIGlobalValues.latOfVertex=float(self.latText.text())
         GUIGlobalValues.longOfVertex=float(self.longText.text())
         print GUIGlobalValues.floors,GUIGlobalValues.northPoint,GUIGlobalValues.latOfVertex,GUIGlobalValues.longOfVertex
-        c=Canvas()
-        c.exec_()
 
+    def showSelection(self):
+        GUIGlobalValues.floors=int(self.floorsText.text())
+        GUIGlobalValues.northPoint=float(self.northPointText.text())
+        GUIGlobalValues.latOfVertex=float(self.latText.text())
+        GUIGlobalValues.longOfVertex=float(self.longText.text())
+        dlg=ShowSelectionsCanvas()
+        dlg.exec_()
 
 
 

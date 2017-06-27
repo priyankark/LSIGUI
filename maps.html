@@ -33,7 +33,26 @@
           zoom: 40,
           mapTypeId:"satellite"
         });
+        var marker=new google.maps.Marker({
+        position:{lat:17.4454, lng:78.3482},
+        title:'Click to enter info'
+      });
+      google.maps.event.addListener(map, 'click', function(event) {
+    placeMarker(event.latLng);
+    pyapi.showMessage('Hello from WebKit')
+
+      });
       }
+
+      function placeMarker(location) {
+  var marker = new google.maps.Marker({
+      position: location,
+      map: map
+  });
+
+  map.setCenter(location);
+}
+
     </script>
     <script>
       document.write('<p>Python ' + pyObj.pyVersion + '</p>')
