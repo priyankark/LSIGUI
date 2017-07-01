@@ -12,6 +12,8 @@ from qgis.core import *
 from qgis.gui import *
 
 
+
+
 #For proxy settings
 class MyNetworkAccessManager(QNetworkAccessManager):
     def __init__(self):
@@ -144,14 +146,21 @@ class takeInputDilaog(QDialog):
             GUIGlobalValues.listOfDXFFiles[i]["dfxSelectTextBox"]=QLineEdit()
 
             GUIGlobalValues.listOfDXFFiles[i]["dfxSelect"].clicked.connect(lambda:self.getDXFFiles(GUIGlobalValues.listOfDXFFiles[i]["dfxSelectTextBox"]))
-            georefButton=QPushButton("GeoReference")
-            viewButton=QPushButton("View")
-            extractButton=QPushButton("Extract")
+            GUIGlobalValues.listOfDXFFiles[i]["georefButton"]=QPushButton("GeoReference")
+            #Ananth's code for this button
+            GUIGlobalValues.listOfDXFFiles[i]["viewButton"]=QPushButton("View")
+            #DFX Viewer code
+            GUIGlobalValues.listOfDXFFiles[i]["extractButton"]=QPushButton("Extract")
+            #Aakash+Saumya+Clean Module code
+
+
+
+
             floorInfoLayout.addWidget(GUIGlobalValues.listOfDXFFiles[i]["dfxSelect"])
             floorInfoLayout.addWidget(GUIGlobalValues.listOfDXFFiles[i]["dfxSelectTextBox"])
-            floorInfoLayout.addWidget(georefButton)
-            floorInfoLayout.addWidget(viewButton)
-            floorInfoLayout.addWidget(extractButton)
+            floorInfoLayout.addWidget(GUIGlobalValues.listOfDXFFiles[i]["georefButton"])
+            floorInfoLayout.addWidget(GUIGlobalValues.listOfDXFFiles[i]["viewButton"])
+            floorInfoLayout.addWidget(GUIGlobalValues.listOfDXFFiles[i]["extractButton"])
             floorInfoWidget=QWidget()
             floorInfoWidget.setLayout(floorInfoLayout)
             mainDlgLayout.addWidget(floorInfoWidget)
@@ -177,8 +186,8 @@ class takeInputDilaog(QDialog):
         if dlg.exec_():
             filename=dlg.selectedFiles()
             GUIGlobalValues.listOfDXFFiles[t]["dfxSelectTextBox"].setText(filename[0])
-            GUIGlobalValues.listOfDXFFiles[t]["DFXfilename"]=filename
-            print GUIGlobalValues.listOfDXFFiles[t]["DFXfilename"]
+            GUIGlobalValues.listOfDXFFiles[t]["DFXFileName"]=filename
+            print GUIGlobalValues.listOfDXFFiles[t]["DFXFileName"]
 
 
     def getIMGFiles(self):
