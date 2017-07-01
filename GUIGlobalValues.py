@@ -5,3 +5,5 @@ global longOfVertex
 global listOfDXFFiles
 global listOfSHPFiles
 global listOfIMGFiles
+
+listOfDXFFiles=dict()

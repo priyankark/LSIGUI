@@ -6,9 +6,20 @@ import sys
 from PyQt4.QtGui import *
 from PyQt4.QtCore import *
 from PyQt4.QtWebKit import *
+from PyQt4.QtNetwork import *
 import GUIGlobalValues
 from qgis.core import *
 from qgis.gui import *
+
+
+#For proxy settings
+class MyNetworkAccessManager(QNetworkAccessManager):
+    def __init__(self):
+        QNetworkAccessManager.__init__(self)
+        proxy = QNetworkProxy(QNetworkProxy.HttpProxy,"http://proxy.iiit.ac.in",8080)
+        self.setProxy(proxy)
+
+
 
 
 class SHPCanvas(QDialog):
@@ -89,7 +100,7 @@ class takeInputDilaog(QDialog):
 
         self.selectDXFFilesLabel=QLabel("Select .dxf files:")
         self.selectDXFFilesButton=QPushButton("Select DXF files")
-        self.selectDXFFilesButton.clicked.connect(self.getDXFFiles)
+        self.selectDXFFilesButton.clicked.connect(self.showDFXDlg)
 
         self.selectIMGFilesLabel=QLabel("Select .svg files:")
         self.selectIMGFilesButton=QPushButton("Select SVG files")
@@ -109,21 +120,66 @@ class takeInputDilaog(QDialog):
         fbox.addRow(self.latOfVertexLabel,self.latText)
         fbox.addRow(self.longOfVertexLabel,self.longText)
         fbox.addRow(self.selectDXFFilesLabel,self.selectDXFFilesButton)
-        fbox.addRow(self.selectIMGFilesLabel,self.selectIMGFilesButton)
+        #fbox.addRow(self.selectIMGFilesLabel,self.selectIMGFilesButton)
         fbox.addRow(self.showSelectionButton,self.submitButton)
         fbox.setAlignment(Qt.AlignTop)
         self.setLayout(fbox)
 
-    def getDXFFiles(self):
+    def showDFXDlg(self):
+        dlg=QDialog()
+        GUIGlobalValues.floors=int(self.floorsText.text())
+        GUIGlobalValues.northPoint=float(self.northPointText.text())
+        GUIGlobalValues.latOfVertex=float(self.latText.text())
+        GUIGlobalValues.longOfVertex=float(self.longText.text())
+        GUIGlobalValues.listOfSHPFiles={}
+        for i in range(0,GUIGlobalValues.floors):
+            GUIGlobalValues.listOfDXFFiles[i]=dict()
+
+        mainDlgLayout=QVBoxLayout()
+        mainDlgWidget=QWidget()
+        for i in range(0,GUIGlobalValues.floors):
+            floorInfoLayout=QHBoxLayout()
+            GUIGlobalValues.listOfDXFFiles[i]["dfxSelect"]=QPushButton("Select Floor "+str(i)+" Plan")
+
+            GUIGlobalValues.listOfDXFFiles[i]["dfxSelectTextBox"]=QLineEdit()
+
+            GUIGlobalValues.listOfDXFFiles[i]["dfxSelect"].clicked.connect(lambda:self.getDXFFiles(GUIGlobalValues.listOfDXFFiles[i]["dfxSelectTextBox"]))
+            georefButton=QPushButton("GeoReference")
+            viewButton=QPushButton("View")
+            extractButton=QPushButton("Extract")
+            floorInfoLayout.addWidget(GUIGlobalValues.listOfDXFFiles[i]["dfxSelect"])
+            floorInfoLayout.addWidget(GUIGlobalValues.listOfDXFFiles[i]["dfxSelectTextBox"])
+            floorInfoLayout.addWidget(georefButton)
+            floorInfoLayout.addWidget(viewButton)
+            floorInfoLayout.addWidget(extractButton)
+            floorInfoWidget=QWidget()
+            floorInfoWidget.setLayout(floorInfoLayout)
+            mainDlgLayout.addWidget(floorInfoWidget)
+
+        dlg.setLayout(mainDlgLayout)
+
+        dlg.exec_()
+
+
+    def getDXFFiles(self,dfxSelectTextBox):
         dlg=QFileDialog()
-        dlg.setFileMode(QFileDialog.ExistingFiles)
+        dlg.setFileMode(QFileDialog.ExistingFile)
         dlg.setFilter("DXF Files (*.dxf)")
+        sender=self.sender()
+        text=sender.text()
+        t=0
+
+        for key,value in GUIGlobalValues.listOfDXFFiles.items():
+            if value["dfxSelect"]==sender:
+                t=int(key)
 
 
         if dlg.exec_():
             filename=dlg.selectedFiles()
-            GUIGlobalValues.listOfDXFFiles=filename
-            print GUIGlobalValues.listOfDXFFiles
+            GUIGlobalValues.listOfDXFFiles[t]["dfxSelectTextBox"].setText(filename[0])
+            GUIGlobalValues.listOfDXFFiles[t]["DFXfilename"]=filename
+            print GUIGlobalValues.listOfDXFFiles[t]["DFXfilename"]
+
 
     def getIMGFiles(self):
         dlg=QFileDialog()
@@ -171,6 +227,20 @@ class Browser(QWebView):
         self.settings().setAttribute(QWebSettings.JavascriptCanOpenWindows, True)
         self.settings().setAttribute(QWebSettings.JavascriptCanAccessClipboard, True)
         self.settings().setAttribute(QWebSettings.DeveloperExtrasEnabled, True)
+
+        #proxy=QNetworkProxy()
+        #proxy.setType(QNetworkProxy.HttpProxy)
+        #proxy.setHostName("http://proxy.iiit.ac.in/")
+        #proxy.setPort(8080)
+        #proxy.setUser("priyankar.kumar98@gmail.com")
+        #proxy.setPassword("5ea291f3")
+        #QNetworkProxy.setApplicationProxy(proxy)
+
+
+        #old_manager = self.page().networkAccessManager()
+        #new_manager = MyNetworkAccessManager()
+        #self.page().setNetworkAccessManager(new_manager)
+
         self.api=PythonAPI()
         self.frame = self.page().mainFrame()
         self.frame.javaScriptWindowObjectCleared.connect(self.load_api)
@@ -204,7 +274,7 @@ class MainApplication(QWidget):
         #myObj = StupidClass()
         self.view = Browser()
         #self.view.page().mainFrame().addToJavaScriptWindowObject("pyObj", myObj)
-        self.view.load(QUrl("/home/priyankar/Desktop/GUIfinal/maps.html"))
+        self.view.load(QUrl("/home/priyankar/Desktop/InternshipWork/GUIfinal/maps.html"))
 
         mapWidgetLayout.addWidget(self.view)
         mapWidget.setLayout(mapWidgetLayout)
@@ -221,15 +291,25 @@ class MainApplication(QWidget):
 
 
 
-
+#QNetworkProxy.HttpProxy,"http://proxy.iiit.ac.in"
 
 
 if __name__ == '__main__':
+    #proxy=QNetworkProxy()
+    #proxy.setType(QNetworkProxy.HttpProxy)
+    #proxy.setHostName("http://proxy.iiit.ac.in/")
+    #proxy.setPort(8080)
+    #proxy.setUser("priyankar.kumar98@gmail.com")
+    #proxy.setPassword("5ea291f3")
+
+    #QNetworkProxy.setApplicationProxy(proxy)
+
     app = QApplication(sys.argv)
     mainApplication=MainApplication()
     QgsApplication.setPrefixPath("/usr", True)
     QgsApplication.initQgis()
     QApplication.processEvents()
+
 
 
     app.exec_()
