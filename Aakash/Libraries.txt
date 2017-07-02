@@ -1,0 +1,2 @@
+1) osgeo
+ For writting into shape files
