@@ -41,6 +41,8 @@ def MakeShapeFile(ArrayOfLineSegmets,name) :
         feature.Destroy()
 
     out_data_source.Destroy()
+
+
 def PrintLines(Array) :
     for i in range(len(Array)) :
         # if i == 4 or i == 5 :

@@ -3,7 +3,7 @@ global northPoint
 global latOfVertex
 global longOfVertex
 global listOfDXFFiles
-global listOfSHPFiles
-global listOfIMGFiles
+#global listOfSHPFiles
+#global listOfIMGFiles
 
 listOfDXFFiles=dict()

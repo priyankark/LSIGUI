@@ -29,12 +29,12 @@ def CanFormWallPair(ls1,ls2) :
     return True
 
 # The main function that takes input of a dxf file and Extracts the center line
-def main() :
-    argument = sys.argv
-    if not (len(argument)==2) :
-        print "Usage: python ExtractLine.py Filename"
-        sys.exit()
-    FileName = argument[1]
+def ExtractLines(FileName) :
+    #argument = sys.argv
+    #if not (len(argument)==2) :
+        #print "Usage: python ExtractLine.py Filename"
+        #sys.exit()
+    #FileName = argument[1]
 
     # Opening the dxf file using ezdxf
     dwg = ezdxf.readfile(FileName)
@@ -188,5 +188,5 @@ def main() :
     # writing into a shape file
     Name = FileName.split('.dxf')[0] + "_segmentedCenterLines.shp"
     MakeShapeFile(NewCenterLines,Name)
-
-main()
+    return Name
+#main()

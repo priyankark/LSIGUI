@@ -3,6 +3,7 @@ sip.setapi('QString', 2)
 
 
 import sys
+import os
 from PyQt4.QtGui import *
 from PyQt4.QtCore import *
 from PyQt4.QtWebKit import *
@@ -10,11 +11,55 @@ from PyQt4.QtNetwork import *
 import GUIGlobalValues
 from qgis.core import *
 from qgis.gui import *
+from Aakash.ExtractLine import *
+
+
+# The MapViewer class is used for displaying the shape file on a canvas. QGIS (Python) has been made use of for the visualization.
+class MapViewer(QMainWindow):
+    def __init__(self,shapefile):
+        QMainWindow.__init__(self)
+        self.setWindowTitle("Map Viewer")
+
+        canvas=QgsMapCanvas()
+        canvas.useImageToRender(False)
+        canvas.setCanvasColor(Qt.white)
+        canvas.show()
+
+        layer=QgsVectorLayer(shapefile,"large","ogr")
+        if not layer.isValid():
+            return IOError("Invalid Shapefile")
+
+        QgsMapLayerRegistry.instance().addMapLayer(layer)
+        canvas.setExtent(layer.extent())
+        canvas.setLayerSet([QgsMapCanvasLayer(layer)])
+
+        self.setCentralWidget(canvas)
+
+
+#This is the class defining the main thread which executes the different functions (Extraction, Polygonization etc)
+class MainExecutionThread(QThread):
+    def __init__(self,fileName,k):
+        QThread.__init__(self)
+        self.SHPfileName=""
+        self.DXFfilename=fileName
+        self.k=k
+
+    def __del__(self):
+        self.wait()
+
+    def run(self):
+        print "DXF file name is ", self.DXFfilename
+        self.SHPfileName=ExtractLines(self.DXFfilename)
+
+        #print self.SHPfileName
+        GUIGlobalValues.listOfDXFFiles[self.k]["SHPFile"]=self.SHPfileName
+        print GUIGlobalValues.listOfDXFFiles[self.k]["SHPFile"]+" saved" #For troubleshooting
+        self.sleep(2)
 
 
 
-
-#For proxy settings
+#Important : Needs to be worked upon. Not used in current program
+# This class shall be used for setting up a network manager to establish connection to the internet over IIIT's proxy.
 class MyNetworkAccessManager(QNetworkAccessManager):
     def __init__(self):
         QNetworkAccessManager.__init__(self)
@@ -24,31 +69,8 @@ class MyNetworkAccessManager(QNetworkAccessManager):
 
 
 
-class SHPCanvas(QDialog):
-   def __init__(self):
-       QDialog.__init__(self)
-
-       grid=QGridLayout()
-       k=0
-       for i in range(int(GUIGlobalValues.floors/2)):
-           for j in range(int(GUIGlobalValues.floors/2)):
-               canvas = QgsMapCanvas()
-               canvas.useImageToRender(False)
-               file=GUIGlobalValues.listOfSHPFiles[k]
-               k=k+1
-               layer = QgsVectorLayer(file,str(k),"ogr")
-               if not layer.isValid():
-                   print "Layer failed to load"
-
-               QgsMapLayerRegistry.instance().addMapLayer(layer);
-               canvas.setExtent(layer.extent())
-               cl = QgsMapCanvasLayer(layer)
-               layers = [cl]
-               canvas.setLayerSet(layers)
-
-               grid.addWidget(canvas,i,j)
-       self.setLayout(grid)
-
+#The class below is for future use
+#This class helps visualize both shp and image files on the canvas (Incomplete)
 class ShowSelectionsCanvas(QDialog):
    def __init__(self):
        QDialog.__init__(self)
@@ -82,8 +104,7 @@ class ShowSelectionsCanvas(QDialog):
 
 
 
-
-
+#This class is used for taking information from the user.
 
 class takeInputDilaog(QDialog):
     def __init__(self):
@@ -108,8 +129,8 @@ class takeInputDilaog(QDialog):
         self.selectIMGFilesButton=QPushButton("Select SVG files")
         self.selectIMGFilesButton.clicked.connect(self.getIMGFiles)
 
-        self.showSelectionButton=QPushButton("Show selections")
-        self.showSelectionButton.clicked.connect(self.showSelection)
+        #self.showSelectionButton=QPushButton("Show selections")
+        #self.showSelectionButton.clicked.connect(self.showSelection)
 
         self.submitButton=QPushButton("Submit")
         self.submitButton.clicked.connect(self.handleSubmit)
@@ -123,10 +144,39 @@ class takeInputDilaog(QDialog):
         fbox.addRow(self.longOfVertexLabel,self.longText)
         fbox.addRow(self.selectDXFFilesLabel,self.selectDXFFilesButton)
         #fbox.addRow(self.selectIMGFilesLabel,self.selectIMGFilesButton)
-        fbox.addRow(self.showSelectionButton,self.submitButton)
+        fbox.addRow(self.submitButton)
         fbox.setAlignment(Qt.AlignTop)
         self.setLayout(fbox)
 
+
+
+
+
+#The dialog that shows up on clicking the 'Select DXF button'
+#All the selections made are stored as a dictionary of dictionaries in GUIGlobalVariable.listOfDXFFiles
+    '''
+    Dictionary structure is defined as follows
+ GUIGlobalValues.listOfDXFFiles={
+    floor_No: {
+        "dxfSelect": reference a QPushButton Object for selecting the DXF,
+         "dxfSelectTextBox": for showing the location of the file selected,
+         "viewButton": button for viewing the final output,
+         "extractButton": for running the main execution thread for extracting the lines, generating the SHP file
+    }
+    }
+    The GUIGlobalVariables module is used for storing the various values so that it is easy to pass these between the other modules.
+    The reason the references to the various PyQt Objects are being passed to the dictionary above is because we require a dynamic GUI.
+    That is, if the user selected the number of floors to be 2, we would have to show the GUI to have options only for taking two inputs
+    in the SelectDXF dialog.
+
+    Storing the various information related to a particular floor in a single dictionary with the key as the floor number and the value as
+    another dictionary with different sub fields related to that particular floor, should later prove advantageous.
+
+
+
+    '''
+
+#Function for selecting the DXF files
     def showDFXDlg(self):
         dlg=QDialog()
         GUIGlobalValues.floors=int(self.floorsText.text())
@@ -141,23 +191,24 @@ class takeInputDilaog(QDialog):
         mainDlgWidget=QWidget()
         for i in range(0,GUIGlobalValues.floors):
             floorInfoLayout=QHBoxLayout()
-            GUIGlobalValues.listOfDXFFiles[i]["dfxSelect"]=QPushButton("Select Floor "+str(i)+" Plan")
+            GUIGlobalValues.listOfDXFFiles[i]["dxfSelect"]=QPushButton("Select Floor "+str(i)+" Plan")
 
-            GUIGlobalValues.listOfDXFFiles[i]["dfxSelectTextBox"]=QLineEdit()
+            GUIGlobalValues.listOfDXFFiles[i]["dxfSelectTextBox"]=QLineEdit()
 
-            GUIGlobalValues.listOfDXFFiles[i]["dfxSelect"].clicked.connect(lambda:self.getDXFFiles(GUIGlobalValues.listOfDXFFiles[i]["dfxSelectTextBox"]))
+            GUIGlobalValues.listOfDXFFiles[i]["dxfSelect"].clicked.connect(lambda:self.getDXFFiles(GUIGlobalValues.listOfDXFFiles[i]["dxfSelectTextBox"]))
             GUIGlobalValues.listOfDXFFiles[i]["georefButton"]=QPushButton("GeoReference")
             #Ananth's code for this button
             GUIGlobalValues.listOfDXFFiles[i]["viewButton"]=QPushButton("View")
             #DFX Viewer code
             GUIGlobalValues.listOfDXFFiles[i]["extractButton"]=QPushButton("Extract")
             #Aakash+Saumya+Clean Module code
+            GUIGlobalValues.listOfDXFFiles[i]["extractButton"].clicked.connect(self.handleExtract)
 
 
 
 
-            floorInfoLayout.addWidget(GUIGlobalValues.listOfDXFFiles[i]["dfxSelect"])
-            floorInfoLayout.addWidget(GUIGlobalValues.listOfDXFFiles[i]["dfxSelectTextBox"])
+            floorInfoLayout.addWidget(GUIGlobalValues.listOfDXFFiles[i]["dxfSelectTextBox"])
+            floorInfoLayout.addWidget(GUIGlobalValues.listOfDXFFiles[i]["dxfSelect"])
             floorInfoLayout.addWidget(GUIGlobalValues.listOfDXFFiles[i]["georefButton"])
             floorInfoLayout.addWidget(GUIGlobalValues.listOfDXFFiles[i]["viewButton"])
             floorInfoLayout.addWidget(GUIGlobalValues.listOfDXFFiles[i]["extractButton"])
@@ -165,12 +216,43 @@ class takeInputDilaog(QDialog):
             floorInfoWidget.setLayout(floorInfoLayout)
             mainDlgLayout.addWidget(floorInfoWidget)
 
+        submit=QPushButton("Submit")
+        submit.clicked.connect(self.showOutput)
+        mainDlgLayout.addWidget(submit)
         dlg.setLayout(mainDlgLayout)
+
 
         dlg.exec_()
 
+#Visualizingthe SHP files
+    def showOutput(self):
+        dlg=QDialog()
+        grid=QVBoxLayout()
+        k=0
+        for i in range(0,GUIGlobalValues.floors):
+            canvas = QgsMapCanvas()
+            canvas.useImageToRender(False)
+            print GUIGlobalValues.listOfDXFFiles[k]["SHPFile"]
+            file=GUIGlobalValues.listOfDXFFiles[k]["SHPFile"]
+            k=k+1
+            layer = QgsVectorLayer(file,str(k),"ogr")
+            if not layer.isValid():
+                print "Layer failed to load"
 
-    def getDXFFiles(self,dfxSelectTextBox):
+            QgsMapLayerRegistry.instance().addMapLayer(layer)
+            canvas.setExtent(layer.extent())
+            cl = QgsMapCanvasLayer(layer)
+            layers = [cl]
+            canvas.setLayerSet(layers)
+
+            grid.addWidget(canvas)
+        dlg.setLayout(grid)
+
+
+        dlg.exec_()
+
+#Opening up the File Dilaog for selecting the DXF file
+    def getDXFFiles(self,dxfSelectTextBox):
         dlg=QFileDialog()
         dlg.setFileMode(QFileDialog.ExistingFile)
         dlg.setFilter("DXF Files (*.dxf)")
@@ -178,18 +260,39 @@ class takeInputDilaog(QDialog):
         text=sender.text()
         t=0
 
+        #The loop below finds the floor number corresponding to the button press i.e.
+        # Which floor's button for selecting the DXF was pressed?
         for key,value in GUIGlobalValues.listOfDXFFiles.items():
-            if value["dfxSelect"]==sender:
+            if value["dxfSelect"]==sender:
                 t=int(key)
 
 
         if dlg.exec_():
             filename=dlg.selectedFiles()
-            GUIGlobalValues.listOfDXFFiles[t]["dfxSelectTextBox"].setText(filename[0])
-            GUIGlobalValues.listOfDXFFiles[t]["DFXFileName"]=filename
-            print GUIGlobalValues.listOfDXFFiles[t]["DFXFileName"]
+            GUIGlobalValues.listOfDXFFiles[t]["dxfSelectTextBox"].setText(filename[0])
+            GUIGlobalValues.listOfDXFFiles[t]["DXFFileName"]=filename[0]
+            print GUIGlobalValues.listOfDXFFiles[t]["DXFFileName"]
+
+#Handling the execution of the main code
+    def handleExtract(self):
+        sender=self.sender()
+        print sender.text()
+        t=0
+        for key,value in GUIGlobalValues.listOfDXFFiles.items():
+            if value["extractButton"]==sender:
+                t=int(key)
+        print t
+
+        print GUIGlobalValues.listOfDXFFiles[t]["DXFFileName"]
+        mainExecutionThread=MainExecutionThread(GUIGlobalValues.listOfDXFFiles[t]["DXFFileName"],t)
+        mainExecutionThread.start()
 
 
+
+
+
+
+#For Image Files (future use, incomplete)
     def getIMGFiles(self):
         dlg=QFileDialog()
         dlg.setFileMode(QFileDialog.ExistingFiles)
@@ -200,6 +303,8 @@ class takeInputDilaog(QDialog):
             GUIGlobalValues.listOfIMGFiles=filename
             print GUIGlobalValues.listOfIMGFiles
 
+
+#Handling of the submission of the form containing the main information (Number of floors etc etc)
     def handleSubmit(self):
         GUIGlobalValues.floors=int(self.floorsText.text())
         GUIGlobalValues.northPoint=float(self.northPointText.text())
@@ -207,16 +312,9 @@ class takeInputDilaog(QDialog):
         GUIGlobalValues.longOfVertex=float(self.longText.text())
         print GUIGlobalValues.floors,GUIGlobalValues.northPoint,GUIGlobalValues.latOfVertex,GUIGlobalValues.longOfVertex
 
-    def showSelection(self):
-        GUIGlobalValues.floors=int(self.floorsText.text())
-        GUIGlobalValues.northPoint=float(self.northPointText.text())
-        GUIGlobalValues.latOfVertex=float(self.latText.text())
-        GUIGlobalValues.longOfVertex=float(self.longText.text())
-        dlg=ShowSelectionsCanvas()
-        dlg.exec_()
 
-
-
+#This API is defined to be able to expose Python Objects and functions to JavaScript.
+#This is mainly for the webview used to display the Google Map. As soon as thye user clicks on a coordinate, takeInputDilaog() would be opened
 class PythonAPI(QObject):
     @pyqtSlot(str,result=str)
     def showMessage(self,theString):
@@ -227,7 +325,7 @@ class PythonAPI(QObject):
         #q.exec_()
 
 
-
+#Class defined for the webview
 class Browser(QWebView):
 
     def __init__(self):
@@ -267,6 +365,8 @@ class Browser(QWebView):
 
         print unicode(frame.toHtml()).encode('utf-8')
 
+
+#Class defined for the Main Application Widget
 class MainApplication(QWidget):
     def __init__(self,parent=None):
         super(MainApplication,self).__init__(parent)
@@ -283,7 +383,11 @@ class MainApplication(QWidget):
         #myObj = StupidClass()
         self.view = Browser()
         #self.view.page().mainFrame().addToJavaScriptWindowObject("pyObj", myObj)
-        self.view.load(QUrl("/home/priyankar/Desktop/InternshipWork/GUIfinal/maps.html"))
+        #self.view.load(QUrl("/home/priyankar/Desktop/InternshipWork/GUIfinal/maps.html"))
+        dir = os.path.dirname(__file__)
+        filename = os.path.join(dir, 'maps.html')
+        self.view.load(QUrl(filename))
+
 
         mapWidgetLayout.addWidget(self.view)
         mapWidget.setLayout(mapWidgetLayout)
@@ -299,10 +403,6 @@ class MainApplication(QWidget):
 
 
 
-
-#QNetworkProxy.HttpProxy,"http://proxy.iiit.ac.in"
-
-
 if __name__ == '__main__':
     #proxy=QNetworkProxy()
     #proxy.setType(QNetworkProxy.HttpProxy)
@@ -315,7 +415,7 @@ if __name__ == '__main__':
 
     app = QApplication(sys.argv)
     mainApplication=MainApplication()
-    QgsApplication.setPrefixPath("/usr", True)
+    QgsApplication.setPrefixPath("/usr", True) #For loading QGIS python. This path is different for Windows.
     QgsApplication.initQgis()
     QApplication.processEvents()
 
