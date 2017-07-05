@@ -2,16 +2,12 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="3bf1f434-926f-4ceb-9921-74fd03051d78" name="Default" comment="">
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/Aakash/Vindhya algo testDXF_centerlines_after_extension.dbf" afterPath="$PROJECT_DIR$/Aakash/Vindhya algo testDXF_centerlines_after_extension.dbf" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/Aakash/Vindhya algo testDXF_centerlines_before_extension.dbf" afterPath="$PROJECT_DIR$/Aakash/Vindhya algo testDXF_centerlines_before_extension.dbf" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/Aakash/Vindhya algo testDXF_segmentedCenterLines.dbf" afterPath="$PROJECT_DIR$/Aakash/Vindhya algo testDXF_segmentedCenterLines.dbf" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/Vindhya algo testDXF_segmentedCenterLines.dbf" afterPath="$PROJECT_DIR$/Vindhya algo testDXF_segmentedCenterLines.dbf" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/inspectionProfiles/Project_Default.xml" afterPath="$PROJECT_DIR$/.idea/inspectionProfiles/Project_Default.xml" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/Reports/Main_Reports/MainReport1.pdf" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/Reports/Minutes_Of_Meeting/MOM#1.pdf" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/Reports/Minutes_Of_Meeting/MOM#2.pdf" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/Reports/Miscellaneous/Doubts.pdf" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/Reports/Weekly_Reports/WSR#1.pdf" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/Aakash/ExtractLine.py" afterPath="$PROJECT_DIR$/Aakash/ExtractLine.py" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/Aakash/GenOutput.py" afterPath="$PROJECT_DIR$/Aakash/GenOutput.py" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/GUIGlobalValues.py" afterPath="$PROJECT_DIR$/GUIGlobalValues.py" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/MainGUI.pyw" afterPath="$PROJECT_DIR$/MainGUI.pyw" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="TRACKING_ENABLED" value="true" />
@@ -71,8 +67,8 @@
       <file leaf-file-name="MainGUI.pyw" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/MainGUI.pyw">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="15">
-              <caret line="112" column="35" lean-forward="true" selection-start-line="112" selection-start-column="35" selection-end-line="112" selection-end-column="35" />
+            <state relative-caret-position="-445">
+              <caret line="125" column="66" lean-forward="true" selection-start-line="125" selection-start-column="66" selection-end-line="125" selection-end-column="66" />
               <folding />
             </state>
           </provider>
@@ -196,6 +192,38 @@
               <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
             </PATH_ELEMENT>
           </PATH>
+          <PATH>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="GUIfinal" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="GUIfinal" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="Reports" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+          </PATH>
+          <PATH>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="GUIfinal" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="GUIfinal" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="Reports" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="Minutes_Of_Meeting" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+          </PATH>
         </subPane>
       </pane>
     </panes>
@@ -205,13 +233,15 @@
     <property name="DefaultHtmlFileTemplate" value="HTML File" />
   </component>
   <component name="RecentsManager">
+    <key name="CopyFile.RECENT_KEYS">
+      <recent name="$PROJECT_DIR$/Reports/Miscellaneous" />
+      <recent name="$PROJECT_DIR$/Reports/Main_Reports" />
+      <recent name="$PROJECT_DIR$/Reports/Minutes_Of_Meeting" />
+      <recent name="$PROJECT_DIR$/Reports/Weekly_Reports" />
+      <recent name="$PROJECT_DIR$" />
+    </key>
     <key name="MoveFile.RECENT_KEYS">
       <recent name="$PROJECT_DIR$/ExampleCode" />
-    </key>
-    <key name="CopyFile.RECENT_KEYS">
-      <recent name="$PROJECT_DIR$" />
-      <recent name="$PROJECT_DIR$/ExampleCode" />
-      <recent name="$PROJECT_DIR$/Aakash" />
     </key>
   </component>
   <component name="RunManager" selected="Python.MainGUI.pyw">
@@ -825,8 +855,8 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/MainGUI.pyw">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="15">
-          <caret line="112" column="35" lean-forward="true" selection-start-line="112" selection-start-column="35" selection-end-line="112" selection-end-column="35" />
+        <state relative-caret-position="-445">
+          <caret line="125" column="66" lean-forward="true" selection-start-line="125" selection-start-column="66" selection-end-line="125" selection-end-column="66" />
           <folding />
         </state>
       </provider>
