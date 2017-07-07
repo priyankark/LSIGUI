@@ -4,14 +4,27 @@ sip.setapi('QString', 2)
 
 import sys
 import os
+
+
+from qgis.core import *
+from qgis.gui import *
 from PyQt4.QtGui import *
 from PyQt4.QtCore import *
 from PyQt4.QtWebKit import *
 from PyQt4.QtNetwork import *
 import GUIGlobalValues
+from Aakash.ExtractLine import *
+
+'''
+from PySide.QtGui import *
+from PySide.QtCore import *
+from PySide.QtWebKit import *
+from PySide.QtNetwork import *
+import GUIGlobalValues
 from qgis.core import *
 from qgis.gui import *
 from Aakash.ExtractLine import *
+'''
 
 
 # The MapViewer class is used for displaying the shape file on a canvas. QGIS (Python) has been made use of for the visualization.
@@ -196,7 +209,7 @@ class takeInputDilaog(QDialog):
             GUIGlobalValues.listOfDXFFiles[i]["dxfSelectTextBox"]=QLineEdit()
 
             GUIGlobalValues.listOfDXFFiles[i]["dxfSelect"].clicked.connect(lambda:self.getDXFFiles(GUIGlobalValues.listOfDXFFiles[i]["dxfSelectTextBox"]))
-            GUIGlobalValues.listOfDXFFiles[i]["georefButton"]=QPushButton("GeoReference")
+            #GUIGlobalValues.listOfDXFFiles[i]["georefButton"]=QPushButton("GeoReference")
             #Ananth's code for this button
             GUIGlobalValues.listOfDXFFiles[i]["viewButton"]=QPushButton("View")
             #DFX Viewer code
@@ -209,7 +222,7 @@ class takeInputDilaog(QDialog):
 
             floorInfoLayout.addWidget(GUIGlobalValues.listOfDXFFiles[i]["dxfSelectTextBox"])
             floorInfoLayout.addWidget(GUIGlobalValues.listOfDXFFiles[i]["dxfSelect"])
-            floorInfoLayout.addWidget(GUIGlobalValues.listOfDXFFiles[i]["georefButton"])
+            #floorInfoLayout.addWidget(GUIGlobalValues.listOfDXFFiles[i]["georefButton"])
             floorInfoLayout.addWidget(GUIGlobalValues.listOfDXFFiles[i]["viewButton"])
             floorInfoLayout.addWidget(GUIGlobalValues.listOfDXFFiles[i]["extractButton"])
             floorInfoWidget=QWidget()
@@ -317,6 +330,7 @@ class takeInputDilaog(QDialog):
 #This is mainly for the webview used to display the Google Map. As soon as thye user clicks on a coordinate, takeInputDilaog() would be opened
 class PythonAPI(QObject):
     @pyqtSlot(str,result=str)
+    #@Slot(str,result=str)
     def showMessage(self,theString):
         #QMessageBox.information(None, "Info","hello")
         inputWidget=takeInputDilaog()
