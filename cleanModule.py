@@ -69,7 +69,7 @@ for i in range(lyr.GetFeatureCount()):
     else:
         c=rx1
 
-    featDict.append({"id":id,"x1":x1,"y1":y1,"x2":x2,"y2":y2,"length":length,"slope":slope,"c":c,"geometry":geom})
+    featDict.append({"id":id,"x1":x1,"y1":y1,"x2":x2,"y2":y2,"length":length,"slope":slope,"c":c,"geometry":geom,"rx1":rx1,"ry1":ry1,"rx2":rx2,"ry2":ry2})
     print id,firstpoint[0],firstpoint[1],lastpoint[0],lastpoint[1],length,"slope",slope,rx1==rx2,c #X,Y,X,Y
 
 featDictCopy=list(featDict)
@@ -108,16 +108,34 @@ largestLineArray=[]
 
 
 #Delete the largest element
+#delFromCleanDataArray=[]
 for i in cleanData:
     pos=0
     longest=featDict[i[pos]]["length"]
+    value=i[0]
     for j in range(0,len(i)):
-        if featDict[i[j]]["length"]>longest:
+        if featDict[i[j]]["length"]>=longest:
             longest=featDict[i[j]]["length"]
             pos=j
-    del(i[pos])
+            value=i[j]
+    delAr=[]
+    for j in range(0,len(i)):
+        if i[j]==value:
+            continue
+        else:
+            if ((featDict[i[j]]["rx1"]<featDict[i[pos]]["rx1"]) and (featDict[i[j]]["rx2"]<=featDict[i[pos]]["rx1"])) or ((featDict[i[j]]["rx1"]>=featDict[i[pos]]["rx2"]) and (featDict[i[j]]["rx2"]>featDict[i[pos]]["rx2"])) :
+                delAr.append((i[j]))
+    delAr.append(i[pos])
+    #delFromCleanDataArray.append(delAr)
+    print "i before",i
+    print "delAr",delAr
+    cleanData[cleanData.index(i)]=list(set(i).difference(set(delAr)))
+    print "i after",i
 
 print cleanData
+
+
+
 
 
 
